@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Bisnis Sederhana</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f3f4f6;
+            --card: #ffffff;
+            --text: #1f2937;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+        .card {
+            background-color: var(--card);
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+        h2 {
+            margin-top: 0;
+            color: var(--primary);
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+        .result {
+            margin-top: 16px;
+            padding: 16px;
+            background-color: #ecfdf5;
+            border-left: 4px solid #10b981;
+            border-radius: 4px;
+            display: none;
+        }
+        .result.error {
+            background-color: #fef2f2;
+            border-left-color: #ef4444;
+        }
+        .result p {
+            margin: 8px 0;
+            font-size: 15px;
+        }
+        .result strong {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- KALKULATOR 1: LABA DAN MARGIN -->
+        <div class="card">
+            <h2>Kalkulator Laba & Margin</h2>
+            <div class="form-group">
+                <label for="modal">Harga Beli / Modal (Rp)</label>
+                <input type="number" id="modal" placeholder="Contoh: 50000">
+            </div>
+            <div class="form-group">
+                <label for="hargaJual">Harga Jual (Rp)</label>
+                <input type="number" id="hargaJual" placeholder="Contoh: 75000">
+            </div>
+            <button onclick="hitungLaba()">Hitung Laba</button>
+            <div id="hasilLaba" class="result"></div>
+        </div>
+
+        <!-- KALKULATOR 2: BREAK EVEN POINT (BEP) -->
+        <div class="card">
+            <h2>Kalkulator Titik Impas (BEP)</h2>
+            <div class="form-group">
+                <label for="biayaTetap">Biaya Tetap / Operasional (Rp)</label>
+                <input type="number" id="biayaTetap" placeholder="Contoh: 5000000 (Sewa, Gaji, dll)">
+            </div>
+            <div class="form-group">
+                <label for="hargaPerUnit">Harga Jual per Unit (Rp)</label>
+                <input type="number" id="hargaPerUnit" placeholder="Contoh: 100000">
+            </div>
+            <div class="form-group">
+                <label for="biayaVariabel">Biaya Variabel per Unit (Rp)</label>
+                <input type="number" id="biayaVariabel" placeholder="Contoh: 60000 (Bahan baku dll)">
+            </div>
+            <button onclick="hitungBEP()">Hitung BEP</button>
+            <div id="hasilBEP" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk format angka ke Rupiah
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(angka);
+        }
+
+        // Fungsi Hitung Laba dan Margin
+        function hitungLaba() {
+            const modal = parseFloat(document.getElementById('modal').value);
+            const hargaJual = parseFloat(document.getElementById('hargaJual').value);
+            const hasilDiv = document.getElementById('hasilLaba');
+
+            if (!modal || !hargaJual || modal <= 0 || hargaJual <= 0) {
+                hasilDiv.className = 'result error';
+                hasilDiv.innerHTML = '<p>Masukkan angka valid untuk modal dan harga jual.</p>';
+                hasilDiv.style.display = 'block';
+                return;
+            }
+
+            const laba = hargaJual - modal;
+            // Rumus margin = (Laba / Harga Jual) * 100
+            const margin = (laba / hargaJual) * 100;
+            // Rumus markup = (Laba / Modal) * 100
+            const markup = (laba / modal) * 100;
+
+            hasilDiv.className = 'result';
+            hasilDiv.innerHTML = `
+                <p>Keuntungan Nominal: <strong>${formatRupiah(laba)}</strong></p>
+                <p>Margin Keuntungan (Laba/Jual): <strong>${margin.toFixed(2)}%</strong></p>
+                <p>Markup (Laba/Modal): <strong>${markup.toFixed(2)}%</strong></p>
+            `;
+            hasilDiv.style.display = 'block';
+        }
+
+        // Fungsi Hitung Break Even Point (BEP)
+        function hitungBEP() {
+            const biayaTetap = parseFloat(document.getElementById('biayaTetap').value);
+            const hargaPerUnit = parseFloat(document.getElementById('hargaPerUnit').value);
+            const biayaVariabel = parseFloat(document.getElementById('biayaVariabel').value);
+            const hasilDiv = document.getElementById('hasilBEP');
+
+            if (!biayaTetap || !hargaPerUnit || !biayaVariabel) {
+                hasilDiv.className = 'result error';
+                hasilDiv.innerHTML = '<p>Harap isi semua bidang angka dengan benar.</p>';
+                hasilDiv.style.display = 'block';
+                return;
+            }
+
+            if (biayaVariabel >= hargaPerUnit) {
+                hasilDiv.className = 'result error';
+                hasilDiv.innerHTML = '<p>Biaya Variabel tidak boleh lebih besar atau sama dengan Harga Jual. Anda akan rugi di setiap penjualan.</p>';
+                hasilDiv.style.display = 'block';
+                return;
+            }
+
+            // Rumus BEP Unit = Biaya Tetap / (Harga per Unit - Biaya Variabel per Unit)
+            const marginKontribusi = hargaPerUnit - biayaVariabel;
+            const bepUnit = biayaTetap / marginKontribusi;
+            const bepRupiah = bepUnit * hargaPerUnit;
+
+            hasilDiv.className = 'result';
+            hasilDiv.innerHTML = `
+                <p>Laba per Unit (Margin Kontribusi): <strong>${formatRupiah(marginKontribusi)}</strong></p>
+                <p>BEP (Target Penjualan): <strong>${Math.ceil(bepUnit)} Unit</strong></p>
+                <p>BEP dalam Rupiah: <strong>${formatRupiah(bepRupiah)}</strong></p>
+                <p style="font-size: 13px; margin-top: 10px; color: #4b5563;">*Anda harus menjual ${Math.ceil(bepUnit)} unit agar tidak rugi (balik modal). Penjualan ke-${Math.ceil(bepUnit) + 1} dan seterusnya adalah keuntungan murni.</p>
+            `;
+            hasilDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
